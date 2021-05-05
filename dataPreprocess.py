@@ -96,7 +96,6 @@ def music_to_csv(midi_files_path):
     except FileExistsError:
         pass
 
-
     for song_path in os.listdir(midi_files_path):
         try:
             midi_file = pm.PrettyMIDI(os.path.join(midi_files_path, song_path))
@@ -110,8 +109,7 @@ def music_to_csv(midi_files_path):
                 time_stamp['key signature'] = get_key_sig(midi_file.key_signature_changes, start_time)
                 time_stamp['time signature'] = get_time_sig(midi_file.time_signature_changes, start_time)
                 for instrument in midi_file.instruments:
-
-
+                    pass
             # df = pd.DataFrame(song_encoding,
             #      columns = ['start',
             #                 'end',
