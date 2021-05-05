@@ -92,7 +92,7 @@ class words_generator:
 # w2v_model.save(os.path.join(model_path, 'w2v_songs'))
 
 def music_to_csv(midi_files_path):
-    tick_window = 10
+    tick_window = 100
     try:
         os.mkdir(os.path.join(data_path, "song_representations"))
     except FileExistsError:
@@ -105,7 +105,7 @@ def music_to_csv(midi_files_path):
             for time in range(0, len(midi_file._PrettyMIDI__tick_to_time), tick_window):
                 time_stamp = []
                 start_time = midi_file.tick_to_time(time)
-                end_time = midi_file.tick_to_time(time + tick_window - 1)
+                end_time = midi_file.tick_to_time(time + tick_window)
                 time_stamp.append(start_time)
                 time_stamp.append(end_time)
                 time_stamp.append(get_key_sig(midi_file.key_signature_changes, start_time))
@@ -121,15 +121,15 @@ def music_to_csv(midi_files_path):
                              ]
 
             for idx, instrument in enumerate(midi_file.instruments):
-                for note in ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'B#']:
+                for note in ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']:
                     gooal_columns.append(f'instrument {str(idx)}: {note}')
                 gooal_columns.append(f'instrument {str(idx)}: velocity')
 
             df = pd.DataFrame(song_encoding,
                               columns=gooal_columns)
-            df.to_csv(os.path.join(data_path, "song_representations/", song_path), sep='\t', index=False)
-        except:
-            pass
+            df.to_csv(os.path.join(data_path, "song_representations/", song_path+'.csv'), sep='\t', index=False)
+        except Exception as e:
+            print(e)
 
 
 def get_key_sig(key_signatures, start_time):
@@ -151,7 +151,7 @@ def collect_relvant_notes(instrument, start_time, end_time):
     for curr_note in instrument.notes:
         if curr_note.start < start_time:
             continue
-        if curr_note.end > end_time:
+        if curr_note.end >= end_time:
             break
         relevant_notes.append(curr_note)
     return relevant_notes
