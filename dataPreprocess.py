@@ -5,6 +5,8 @@ import os
 from functools import reduce
 import operator
 
+from sklearn.decomposition import PCA
+
 import gensim
 from gensim.models import KeyedVectors
 from nltk.corpus import stopwords
@@ -91,6 +93,7 @@ class words_generator:
 #     os.makedirs(model_path)
 # w2v_model.save(os.path.join(model_path, 'w2v_songs'))
 
+
 def music_to_csv(midi_files_path):
     tick_window = 100
     try:
@@ -130,6 +133,26 @@ def music_to_csv(midi_files_path):
             df.to_csv(os.path.join(data_path, "song_representations/", song_path+'.csv'), sep='\t', index=False)
         except Exception as e:
             print(e)
+
+
+def create_pca_to_csv(songs_folder: str):
+
+    pca_comp_amount = 30
+    songs_names = list()
+    final_pcas = list()
+    for song_path in os.listdir(songs_folder):
+        df = pd.read_csv(os.path.join(songs_folder, song_path), sep='\t')
+        songs_names.append([song_path])
+        pca = PCA(n_components=min(pca_comp_amount, df.shape[1]))
+        pca.fit(df.to_numpy(dtype="float"))
+        res = np.zeros((pca_comp_amount, 200))
+        pca_comps = pca.components_
+        res[:pca_comps.shape[0], : pca_comps.shape[1]] = pca_comps[:, :200]
+        res = res.reshape((1, pca_comp_amount*200))
+        final_pcas.append(res[0])
+
+    final_np = np.concatenate((songs_names, final_pcas), axis=1)
+    pd.DataFrame(final_np).to_csv(os.path.join(data_path, "pcas.csv"), index=False)
 
 
 def get_key_sig(key_signatures, start_time):
