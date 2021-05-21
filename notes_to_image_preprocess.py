@@ -50,6 +50,7 @@ def build_jpg_dataset(jpg_dir_path):
             mir_eval.display.events(beats, base=ymin, height=ymax, color='#AAAAAA', lw=0.1)
             mir_eval.display.events(downbeats, base=ymin, height=ymax, color='#FFFFFF', lw=0.25)
             plt.savefig(os.path.join(jpg_dir_path, path + ".jpg"))
+            plt.close()
         except Exception as e:
             bad_songs.append(path)
             print(e)

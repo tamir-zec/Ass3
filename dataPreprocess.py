@@ -7,11 +7,6 @@ import operator
 
 from sklearn.decomposition import PCA
 
-import gensim
-from gensim.models import KeyedVectors
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-import gensim.downloader as api
 
 Normalized_Pitch = 127
 data_path = 'C:/code/course/Deep_learning/Ass3/Data'
@@ -64,34 +59,6 @@ def midi_to_csv(midi_files_path):
     df.to_csv('Data/midi_df.csv', sep='\t', index=False)
     with open('Data/badSongs.txt', 'w') as file:
         file.writelines('\n'.join(bad_songs))
-
-
-class words_generator:
-    def __init__(self, lyrics):
-        self.lyrics = lyrics
-
-    def __iter__(self):
-        for song in self.lyrics:
-            yield song.split()
-
-
-#   def lyrics_to_embedding(data_lyrics_path):
-# lyrics_df = pd.read_csv(data_lyrics_path, sep=',', names=['artist', 'song_name', 'lyrics'],
-#                         usecols=[0, 1, 2], header=None)
-# # nltk.download('stopwords')
-# # stopwords_list = stopwords.words("english")
-# EMBEDDING_DIM = 300
-# gen_lyrics = words_generator(lyrics_df['lyrics'])
-# glove_key_words = api.load("glove-wiki-gigaword-300")
-# w2v_model = gensim.models.Word2Vec(sentences=gen_lyrics, vector_size=EMBEDDING_DIM, window=8, min_count=1)
-# w2v_model.wv = glove_key_words
-# w2v_model.train(corpus_iterable=gen_lyrics, total_examples=w2v_model.corpus_count, epochs=2)
-#
-# #save model
-# model_path = os.path.join(data_path, 'w2v_model')
-# if not os.path.exists(model_path):
-#     os.makedirs(model_path)
-# w2v_model.save(os.path.join(model_path, 'w2v_songs'))
 
 
 def music_to_csv(midi_files_path):
