@@ -4,64 +4,22 @@ import numpy as np
 import os
 from functools import reduce
 import operator
-
 from sklearn.decomposition import PCA
-
-
-Normalized_Pitch = 127
-data_path = 'C:/code/course/Deep_learning/Ass3/Data'
 
 
 # Pitch from C-1 to G-9 values 0-127
 # velocity - indicates volume level, 1-127 as well
 
-def reshape_lists(*args):
-    output_data = []
-    if len(args) > 0:
-        for row_index in range(len(args[0])):
-            row = []
-            for num_of_lists in range(len(args)):
-                row.append(args[num_of_lists][row_index])
-            output_data.append(row)
-    return output_data
-
-
-def midi_to_csv(midi_files_path):
-    bad_songs = []
-    song_names = []
-    key_signatures = []
-    time_signatures = []
-    ticks = []
-    is_drum = []
-    notes_lists = []
-
-    for path in os.listdir(midi_files_path):
-        try:
-            midi_file = pm.PrettyMIDI(os.path.join(midi_files_path, path))
-            for instrument in midi_file.instruments:
-                song_names.append(path)
-                key_signatures.append(midi_file.key_signature_changes)
-                time_signatures.append(midi_file.time_signature_changes)
-                ticks.append(midi_file._tick_scales)
-                is_drum.append(instrument.is_drum)
-                notes_lists.append(instrument.notes)
-        except:
-            bad_songs.append(path)
-
-    data = reshape_lists(song_names, key_signatures, time_signatures, ticks, is_drum, notes_lists)
-    df = pd.DataFrame(data,
-                      columns=['song_name',
-                               'key_signatures',
-                               'time_signatures',
-                               'ticks',
-                               'is_drum',
-                               'notes_lists'])
-    df.to_csv('Data/midi_df.csv', sep='\t', index=False)
-    with open('Data/badSongs.txt', 'w') as file:
-        file.writelines('\n'.join(bad_songs))
+Normalized_Pitch = 127
+data_path = 'C:/code/course/Deep_learning/Ass3/Data'
 
 
 def music_to_csv(midi_files_path):
+    '''
+    :param midi_files_path: the path where all the midi files are stored
+    :return: creates a folder under data_path named song representations and outputs
+             some files to represent each song, doesnt return anything.
+    '''
     tick_window = 100
     try:
         os.mkdir(os.path.join(data_path, "song_representations"))
@@ -103,7 +61,7 @@ def music_to_csv(midi_files_path):
 
 
 def create_pca_to_csv(songs_folder: str):
-
+    # pca size, other sizes where problemetic, can be altered
     pca_comp_amount = 30
     songs_names = list()
     final_pcas = list()
@@ -159,12 +117,13 @@ def get_instrument_info(instrument, start_time, end_time):
 
 
 def main():
+    # data path is defined in the beginning of the file,
+    # we expect every other data folder to be under it/data file
     midi_dir = 'midi_files'
-    train_set_path = 'lyrics_train_set.csv'
-    model_path = 'Data/w2v_model'
-    # midi_to_csv(os.path.join(data_path, midi_dir))
+    # music to csv takes each song and make a represntative of it
     music_to_csv(os.path.join(data_path, midi_dir))
-    # lyrics_to_embedding(os.path.join(data_path, train_set_path))
+    # following that we make a PCA dimension reduction for each input, and export as csv under data path
+    create_pca_to_csv(os.path.join(data_path, midi_dir))
 
 
 if __name__ == '__main__':
